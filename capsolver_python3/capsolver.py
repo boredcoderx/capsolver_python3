@@ -38,7 +38,6 @@ class CapSolver:
         for i in range(0, maximum_time + 1, 1):
             result = self.get_task_result(task_id)
             if result is not False and result is not None:
-                # print(result)
                 return result
             elif result is False:
                 i += 1
@@ -55,8 +54,9 @@ class CapSolver:
                 await asyncio.sleep(1)
         raise CapSolverException(61, "ERROR_MAXIMUM_TIME_EXCEED", "Maximum time is exceed.")
 
-    # TODO: Get a soft id for this one
     def _make_request(self, method: RequestType, data: dict):
+        if method == RequestType.CreateTask or method == RequestType.CreateTaskAntiAkamai or method == RequestType.CreateTaskKasada:
+            data["appId"] = "98CB2DB1-3C22-482A-966C-DE92244349D9"
         if method == RequestType.CreateTask:
             method = '/createTask'
         elif method == RequestType.GetTaskResult:
@@ -65,7 +65,6 @@ class CapSolver:
             response = requests.post("{}{}".format(self._BETA_HOST_URL if self.beta else self._HOST_URL, method), json=data).json()
         except Exception as err:
             raise CapSolverException(-1, type(err).__name__, str(err))
-        # input(response)
         return response
 
     @staticmethod
